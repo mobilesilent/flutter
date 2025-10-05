@@ -52,8 +52,8 @@ class _ComplaintState extends State<Complaint> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 88, 62, 53),
-        title: const Text('Complaint'),
+        backgroundColor: Colors.indigo,
+        title: const Text('Complaint',style: TextStyle(color: Colors.white),),
         centerTitle: true,
         elevation: 4,
       ),
@@ -82,7 +82,7 @@ class _ComplaintState extends State<Complaint> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.brown,
+                    color: Colors.indigo,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -121,17 +121,17 @@ class _ComplaintState extends State<Complaint> {
                   child: ElevatedButton(
                     onPressed: _submitComplaint,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 70, 48, 41),
+                      backgroundColor: Colors.indigo,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 5,
-                      shadowColor: Colors.brown,
+                      
                     ),
                     child: const Text(
                       'Submit Complaint',
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600,color:Colors.white),
                     ),
                   ),
                 ),
@@ -144,7 +144,7 @@ class _ComplaintState extends State<Complaint> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.brown,
+                      color: Colors.indigo,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -168,7 +168,7 @@ class _ComplaintState extends State<Complaint> {
                               'Complaint:',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.brown[700]),
+                                  color: Colors.indigo),
                             ),
                             const SizedBox(height: 6),
                             Text(
@@ -180,7 +180,7 @@ class _ComplaintState extends State<Complaint> {
                               'Reply:',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.brown[700]),
+                                  color: Colors.indigo),
                             ),
                             const SizedBox(height: 6),
                             complaintItem.reply == null

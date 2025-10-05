@@ -1,7 +1,9 @@
 import 'package:automaticmb/complaint.dart';
 import 'package:automaticmb/feedback.dart';
+import 'package:automaticmb/home.dart';
 import 'package:automaticmb/loginscreen.dart';
 import 'package:automaticmb/register.dart';
+import 'package:automaticmb/timetable.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,7 +36,8 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 234, 232, 238)),
       ),
-      home: Complaint(),
+      home: HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

@@ -8,7 +8,7 @@ class Loginscreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor:Color.fromARGB(255, 114, 59, 39),
+        backgroundColor:Colors.indigo,
         title: const Text('Login'),
         centerTitle: true,
         elevation: 4,
@@ -38,13 +38,13 @@ class Loginscreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 114, 59, 39),
+                    color: Colors.indigo,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Please login to your account',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(fontSize: 16, color: Colors.indigo),
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
@@ -81,7 +81,7 @@ class Loginscreen extends StatelessWidget {
                       // Add login logic here
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 114, 59, 39),
+                      backgroundColor: Colors.indigo.shade50,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -103,7 +103,7 @@ class Loginscreen extends StatelessWidget {
                   },
                   child: const Text(
                     'Forgot Password?',
-                    style: TextStyle(color: Colors.black54),
+                    style: TextStyle(color: Colors.indigo),
                   ),
                 ),
               ],

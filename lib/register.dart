@@ -8,8 +8,8 @@ class Register extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.brown,
-        title: const Text('Registration'),
+        backgroundColor: Colors.indigo,
+        title: const Text('Registration',style: TextStyle(color: Colors.white),),
         centerTitle: true,
         elevation: 4,
       ),
@@ -24,7 +24,7 @@ class Register extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.brown.withOpacity(0.15),
+                  color: Colors.indigo,
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 )
@@ -38,14 +38,14 @@ class Register extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.brown,
+                    color: Colors.indigo,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
                 const Text(
                   'Fill the form below to register',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: TextStyle(fontSize: 16, color: Colors.indigo),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -158,12 +158,12 @@ class Register extends StatelessWidget {
                       // Handle registration logic here
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown,
+                      backgroundColor: Colors.indigo.shade200,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 5,
-                      shadowColor: Colors.brown,
+                      shadowColor: Colors.indigo,
                     ),
                     child: const Text(
                       'Register',

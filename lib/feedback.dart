@@ -9,8 +9,8 @@ class Feedbackk extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.brown,
-        title: Text('Feedback'),
+        backgroundColor: Colors.indigo,
+        title: Text('Feedback',style: TextStyle(color: Colors.white),),
         centerTitle: true,
       ),
       body: SingleChildScrollView( // In case content overflows
