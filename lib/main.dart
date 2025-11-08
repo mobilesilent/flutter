@@ -1,43 +1,75 @@
-import 'package:automaticmb/complaint.dart';
-import 'package:automaticmb/feedback.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:automaticmb/home.dart';
 import 'package:automaticmb/loginscreen.dart';
+import 'package:automaticmb/complaint.dart';
+import 'package:automaticmb/feedback.dart';
 import 'package:automaticmb/register.dart';
 import 'package:automaticmb/timetable.dart';
-import 'package:flutter/material.dart';
+
+/// --- CHANGE THIS TO MATCH YOUR PACKAGE NAME ---
+const _channelName = 'com.example.automaticmb/dnd'; 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 234, 232, 238)),
-      ),
-      home: HomePage(),
+      title: 'AutomaticMB',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        useMaterial3: true,
+      ),
+      home:  Loginscreen(),
     );
+  }
+}
+
+/// ✅ DND helper class to be used anywhere in the app (e.g., inside HomePage)
+class DndHelper {
+  static const platform = MethodChannel(_channelName);
+
+  /// Open system settings to grant DND permission
+  static Future<String> openDndSettings() async {
+    try {
+      await platform.invokeMethod('openDndSettings');
+      return 'Opened DND settings — grant access.';
+    } on PlatformException catch (e) {
+      return 'Error opening DND settings: ${e.message}';
+    }
+  }
+
+  /// Schedule DND mode between two times
+  static Future<String> scheduleDnd({
+    required DateTime start,
+    required DateTime end,
+  }) async {
+    try {
+      await platform.invokeMethod('scheduleDnd', {
+        'startMillis': start.millisecondsSinceEpoch,
+        'endMillis': end.millisecondsSinceEpoch,
+      });
+      return 'Scheduled DND from $start → $end';
+    } on PlatformException catch (e) {
+      return 'Schedule error: ${e.message}';
+    }
+  }
+
+  /// Cancel DND schedule
+  static Future<String> cancelDnd() async {
+    try {
+      await platform.invokeMethod('cancelDnd');
+      return 'Cancelled DND schedule.';
+    } on PlatformException catch (e) {
+      return 'Cancel error: ${e.message}';
+    }
   }
 }

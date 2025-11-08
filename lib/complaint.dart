@@ -1,4 +1,7 @@
+import 'package:automaticmb/loginscreen.dart';
+import 'package:automaticmb/register.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
 class Complaint extends StatefulWidget {
   const Complaint({super.key});
@@ -9,36 +12,84 @@ class Complaint extends StatefulWidget {
 
 class ComplaintItem {
   final String complaint;
-  String? reply;
-  ComplaintItem({required this.complaint, this.reply});
+  final String reply;
+
+  ComplaintItem({required this.complaint, required this.reply});
 }
 
 class _ComplaintState extends State<Complaint> {
   final TextEditingController _complaintController = TextEditingController();
   final List<ComplaintItem> _complaints = [];
+  final Dio dio = Dio();
 
-  void _submitComplaint() {
+  @override
+  void initState() {
+    super.initState();
+    fetchComplaints();
+  }
+
+  // ✅ Fetch complaints from backend
+  Future<void> fetchComplaints() async {
+    try {
+      final response = await dio.get('$baseurl/complaint_api/$loginid');
+      if (response.statusCode == 200) {
+        final List data = response.data;
+        setState(() {
+          _complaints.clear();
+          _complaints.addAll(
+            data.map(
+              (item) => ComplaintItem(
+                complaint: item['complaints'] ?? '',
+                reply: item['reply']?.isNotEmpty == true
+                    ? item['reply']
+                    : 'No reply yet',
+              ),
+            ),
+          );
+        });
+      }
+    } catch (e) {
+      print('❌ Fetch error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to fetch complaints')),
+      );
+    }
+  }
+
+  // ✅ Send complaint to backend
+  Future<void> _submitComplaint() async {
     final text = _complaintController.text.trim();
 
     if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a complaint')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter a complaint')));
       return;
     }
 
-    // Add new complaint with empty reply
-    setState(() {
-      _complaints.add(ComplaintItem(complaint: text));
-      _complaintController.clear();
-    });
+    try {
+      final response = await dio.post(
+        '$baseurl/complaint_api/$loginid',
+        data: {'complaints': text},
+      );
 
-    // Simulate backend reply fetching with delay
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _complaints.last.reply = "This is a reply from backend for: \"$text\"";
-      });
-    });
+      if (response.statusCode == 200) {
+        _complaintController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Complaint submitted successfully')),
+        );
+        fetchComplaints(); // refresh list
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to submit complaint')),
+        );
+      }
+    } catch (e) {
+      print('❌ Submit error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error submitting complaint')),
+      );
+    }
   }
 
   @override
@@ -53,7 +104,7 @@ class _ComplaintState extends State<Complaint> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: Colors.indigo,
-        title: const Text('Complaint',style: TextStyle(color: Colors.white),),
+        title: const Text('Complaint', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 4,
       ),
@@ -71,7 +122,7 @@ class _ComplaintState extends State<Complaint> {
                   color: Colors.brown.withOpacity(0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
-                )
+                ),
               ],
             ),
             child: Column(
@@ -94,7 +145,7 @@ class _ComplaintState extends State<Complaint> {
                 ),
                 const SizedBox(height: 30),
 
-                // Complaint input
+                // 📝 Complaint Input
                 TextFormField(
                   controller: _complaintController,
                   maxLines: 5,
@@ -105,7 +156,10 @@ class _ComplaintState extends State<Complaint> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.brown, width: 2),
+                      borderSide: const BorderSide(
+                        color: Colors.indigo,
+                        width: 2,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
@@ -116,6 +170,7 @@ class _ComplaintState extends State<Complaint> {
                 ),
                 const SizedBox(height: 20),
 
+                // 📤 Submit Button
                 SizedBox(
                   height: 50,
                   child: ElevatedButton(
@@ -126,18 +181,20 @@ class _ComplaintState extends State<Complaint> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 5,
-                      
                     ),
                     child: const Text(
                       'Submit Complaint',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600,color:Colors.white),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 40),
 
+                // 📋 Complaints List
                 if (_complaints.isNotEmpty) ...[
                   const Text(
                     'Complaints & Replies',
@@ -154,54 +211,65 @@ class _ComplaintState extends State<Complaint> {
                     itemCount: _complaints.length,
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
-                      final complaintItem = _complaints[index];
+                      final item = _complaints[index];
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.brown.withOpacity(0.05),
+                          color: Colors.indigo.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Complaint:',
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.indigo,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              complaintItem.complaint,
+                              item.complaint,
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 12),
-                            Text(
+                            const Text(
                               'Reply:',
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.indigo,
+                              ),
                             ),
                             const SizedBox(height: 6),
-                            complaintItem.reply == null
-                                ? const Text(
-                                    'Fetching reply...',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.grey,
-                                    ),
-                                  )
-                                : Text(
-                                    complaintItem.reply!,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
+                            Text(
+                              item.reply,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: item.reply == 'No reply yet'
+                                    ? Colors.grey
+                                    : Colors.black,
+                                fontStyle: item.reply == 'No reply yet'
+                                    ? FontStyle.italic
+                                    : FontStyle.normal,
+                              ),
+                            ),
                           ],
                         ),
                       );
                     },
-                  )
-                ]
+                  ),
+                ] else ...[
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'No complaints yet.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
