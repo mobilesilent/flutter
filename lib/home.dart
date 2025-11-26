@@ -98,7 +98,7 @@ class HomePage extends StatelessWidget {
     _HomeItem(
       title: 'Timetable',
       icon: Icons.calendar_today,
-      page: TimetableScreen(),
+      page: ViewTimetablePage(),
     ),
     _HomeItem(title: 'Feedback', icon: Icons.feedback, page: Feedbackk()),
     _HomeItem(

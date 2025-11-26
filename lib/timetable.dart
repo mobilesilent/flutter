@@ -145,3 +145,142 @@
 //     );
 //   }
 // }
+
+import 'package:automaticmb/register.dart';
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:automaticmb/loginscreen.dart';
+
+class ViewTimetablePage extends StatefulWidget {
+  const ViewTimetablePage({super.key});
+
+  @override
+  State<ViewTimetablePage> createState() => _ViewTimetablePageState();
+}
+
+class _ViewTimetablePageState extends State<ViewTimetablePage> {
+  late Future<List<Timetable>> timetableFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    timetableFuture = fetchTimetable(loginid!);
+  }
+
+  Future<List<Timetable>> fetchTimetable(int lid) async {
+    try {
+      final response = await Dio().get("$baseurl/ViewTimeTable/$lid");
+      return (response.data as List)
+          .map((json) => Timetable.fromJson(json))
+          .toList();
+    } catch (e) {
+      throw Exception("Failed to load timetable: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Timetable"),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: FutureBuilder<List<Timetable>>(
+        future: timetableFuture,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+                child: CircularProgressIndicator(color: Colors.deepPurple));
+          }
+
+          final data = snapshot.data!;
+          if (data.isEmpty) {
+            return const Center(child: Text("No timetable found"));
+          }
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              double screenWidth = constraints.maxWidth;
+
+              // FIXED table width (needed for scaling)
+              double tableWidth = 600;
+
+              // Auto scale factor so whole table fits screen
+              double scaleFactor = screenWidth / tableWidth;
+
+              return InteractiveViewer(
+                minScale: scaleFactor, // so it stays fully visible
+                maxScale: 4.0,
+                boundaryMargin: const EdgeInsets.all(100),
+
+                child: Transform.scale(
+                  scale: scaleFactor,
+                  alignment: Alignment.topLeft,
+
+                  child: SizedBox(
+                    width: tableWidth,
+                    child: DataTable(
+                      columnSpacing: 30,
+                      border: TableBorder.all(color: Colors.black26),
+                      columns: const [
+                        DataColumn(label: Text("Day", style: boldStyle)),
+                        DataColumn(label: Text("9–10", style: boldStyle)),
+                        DataColumn(label: Text("10–11", style: boldStyle)),
+                        DataColumn(label: Text("11–12", style: boldStyle)),
+                        DataColumn(label: Text("12–1", style: boldStyle)),
+                        DataColumn(label: Text("2–3", style: boldStyle)),
+                      ],
+                      rows: data.map((t) {
+                        return DataRow(
+                          cells: [
+                            DataCell(Text(t.day)),
+                            DataCell(Text(t.subject1)),
+                            DataCell(Text(t.subject2)),
+                            DataCell(Text(t.subject3)),
+                            DataCell(Text(t.subject4)),
+                            DataCell(Text(t.subject5)),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+const boldStyle = TextStyle(fontWeight: FontWeight.bold);
+
+class Timetable {
+  final String day;
+  final String subject1;
+  final String subject2;
+  final String subject3;
+  final String subject4;
+  final String subject5;
+
+  Timetable({
+    required this.day,
+    required this.subject1,
+    required this.subject2,
+    required this.subject3,
+    required this.subject4,
+    required this.subject5,
+  });
+
+  factory Timetable.fromJson(Map<String, dynamic> json) {
+    return Timetable(
+      day: json["day"] ?? "",
+      subject1: json["subject1"] ?? "",
+      subject2: json["subject2"] ?? "",
+      subject3: json["subject3"] ?? "",
+      subject4: json["subject4"] ?? "",
+      subject5: json["subject5"] ?? "",
+    );
+  }
+}

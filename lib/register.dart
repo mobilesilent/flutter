@@ -10,10 +10,14 @@ class Register extends StatefulWidget {
 }
 
 final Dio _dio = Dio();
-const String baseurl = "http://192.168.43.191:5000"; // 🔹 Update this
+const String baseurl = "http://192.168.1.144:5000"; // 🔹 Update this
 
 class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
+
+  List<Map<String, dynamic>> _classList = [];
+int? _selectedClass; // Stores dropdown value
+bool _loadingClasses = true;
 
   // Controllers
   final TextEditingController _usernameController = TextEditingController();
@@ -28,6 +32,53 @@ class _RegisterState extends State<Register> {
 
   bool _loading = false;
 
+
+  Future<void> _fetchClasses() async {
+  try {
+    final response = await _dio.get("$baseurl/ViewClassrooms");
+    print(response.data);
+    if (response.statusCode == 200) {
+      setState(() {
+        _classList = List<Map<String, dynamic>>.from(response.data);
+        _loadingClasses = false;
+      });
+    } else {
+      throw Exception("Failed to load class list");
+    }
+  } catch (e) {
+    setState(() => _loadingClasses = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error loading classes: $e")),
+    );
+  }
+}
+ Future<void> _fetchDepartment() async {
+  try {
+    final response = await _dio.get("$baseurl/ViewDepartment");
+    print(response.data);
+    if (response.statusCode == 200) {
+      setState(() {
+        _classList = List<Map<String, dynamic>>.from(response.data);
+        _loadingClasses = false;
+      });
+    } else {
+      throw Exception("Failed to load class list");
+    }
+  } catch (e) {
+    setState(() => _loadingClasses = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error loading classes: $e")),
+    );
+  }
+}
+@override
+void initState() {
+  super.initState();
+  _fetchClasses();
+  _fetchDepartment();
+  
+}
+
   Future<void> _registerStudent() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -39,7 +90,7 @@ class _RegisterState extends State<Register> {
       "name": _nameController.text.trim(),
       "admission_no": _admissionController.text.trim(),
       "department": _departmentController.text.trim(),
-      "class_name": _classController.text.trim(),
+      "class_name": _selectedClass,
       "semester": _semesterController.text.trim(),
       "email_id": _emailController.text.trim(),
       "phone_no": _phoneController.text.trim(),
@@ -173,12 +224,32 @@ class _RegisterState extends State<Register> {
                     "Enter department",
                   ),
                   const SizedBox(height: 15),
-                  _buildTextField(
-                    _classController,
-                    "Class",
-                    Icons.class_,
-                    "Enter class",
-                  ),
+                  _loadingClasses
+    ? const Center(child: CircularProgressIndicator())
+    : DropdownButtonFormField<int>(
+  value: _selectedClass,
+  items: _classList.map((classItem) {
+    return DropdownMenuItem<int>(
+      value: classItem["id"] as int,
+      child: Text(classItem["ClassName"]),
+    );
+  }).toList(),
+  decoration: InputDecoration(
+    labelText: "Class",
+    prefixIcon: const Icon(Icons.class_),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  validator: (value) => value == null ? "Please select a class" : null,
+  onChanged: (value) {
+    setState(() {
+      _selectedClass = value;
+    });
+  },
+),
+
+
                   const SizedBox(height: 15),
                   _buildTextField(
                     _semesterController,

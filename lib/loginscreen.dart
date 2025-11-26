@@ -38,7 +38,7 @@ class _LoginscreenState extends State<Loginscreen> {
         data: {'username': username, 'password': password},
       );
       print(response.data);
-      if (response.statusCode == 200 && response.data['message'] == 'success') {
+      if (response.statusCode == 200 || response.statusCode==201) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Login Successful!')));
