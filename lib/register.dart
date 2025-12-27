@@ -10,13 +10,15 @@ class Register extends StatefulWidget {
 }
 
 final Dio _dio = Dio();
-const String baseurl = "http://192.168.1.144:5000"; // 🔹 Update this
+const String baseurl = "http://192.168.1.94:5000"; // 🔹 Update this
 
 class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> _classList = [];
+  List<Map<String, dynamic>> _departmentList = [];
 int? _selectedClass; // Stores dropdown value
+int? _selectedDepartment;
 bool _loadingClasses = true;
 
   // Controllers
@@ -40,6 +42,7 @@ bool _loadingClasses = true;
     if (response.statusCode == 200) {
       setState(() {
         _classList = List<Map<String, dynamic>>.from(response.data);
+        
         _loadingClasses = false;
       });
     } else {
@@ -52,30 +55,30 @@ bool _loadingClasses = true;
     );
   }
 }
- Future<void> _fetchDepartment() async {
-  try {
-    final response = await _dio.get("$baseurl/ViewDepartment");
-    print(response.data);
-    if (response.statusCode == 200) {
-      setState(() {
-        _classList = List<Map<String, dynamic>>.from(response.data);
-        _loadingClasses = false;
-      });
-    } else {
-      throw Exception("Failed to load class list");
-    }
-  } catch (e) {
-    setState(() => _loadingClasses = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error loading classes: $e")),
-    );
-  }
-}
+//  Future<void> _fetchDepartment() async {
+//   try {
+//     final response = await _dio.get("$baseurl/ViewDepartmentApi");
+//     print('deppp${response.data}');
+//     if (response.statusCode == 200) {
+//       setState(() {
+//         _departmentList = List<Map<String, dynamic>>.from(response.data);
+//         _loadingClasses = false;
+//       });
+//     } else {
+//       throw Exception("Failed to load class list");
+//     }
+//   } catch (e) {
+//     setState(() => _loadingClasses = false);
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Error loading Department: $e")),
+//     );
+//   }
+// }
 @override
 void initState() {
   super.initState();
   _fetchClasses();
-  _fetchDepartment();
+  // _fetchDepartment();
   
 }
 
@@ -89,8 +92,8 @@ void initState() {
       "password": _passwordController.text.trim(),
       "name": _nameController.text.trim(),
       "admission_no": _admissionController.text.trim(),
-      "department": _departmentController.text.trim(),
-      "class_name": _selectedClass,
+      // "department": _departmentController.text.trim(),
+      "CLASS": _selectedClass,
       "semester": _semesterController.text.trim(),
       "email_id": _emailController.text.trim(),
       "phone_no": _phoneController.text.trim(),
@@ -137,7 +140,7 @@ void initState() {
     _passwordController.clear();
     _nameController.clear();
     _admissionController.clear();
-    _departmentController.clear();
+    // _departmentController.clear();
     _classController.clear();
     _semesterController.clear();
     _emailController.clear();
@@ -216,17 +219,31 @@ void initState() {
                     Icons.school,
                     "Enter admission no",
                   ),
+                  // const SizedBox(height: 15),
+//                    DropdownButtonFormField<int>(
+//   value: _selectedDepartment,
+//   items: _departmentList.map((DepartmentItem) {
+//     return DropdownMenuItem<int>(
+//       value: DepartmentItem["id"] as int,
+//       child: Text(DepartmentItem["department"]),
+//     );
+//   }).toList(),
+//   decoration: InputDecoration(
+//     labelText: "Department",
+//     prefixIcon: const Icon(Icons.class_),
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(10),
+//     ),
+//   ),
+//   validator: (value) => value == null ? "Please select a department" : null,
+//   onChanged: (value) {
+//     setState(() {
+//       _selectedDepartment = value;
+//     });
+//   },
+// ),
                   const SizedBox(height: 15),
-                  _buildTextField(
-                    _departmentController,
-                    "Department",
-                    Icons.apartment,
-                    "Enter department",
-                  ),
-                  const SizedBox(height: 15),
-                  _loadingClasses
-    ? const Center(child: CircularProgressIndicator())
-    : DropdownButtonFormField<int>(
+                 DropdownButtonFormField<int>(
   value: _selectedClass,
   items: _classList.map((classItem) {
     return DropdownMenuItem<int>(
