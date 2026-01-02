@@ -10,7 +10,7 @@ class Register extends StatefulWidget {
 }
 
 final Dio _dio = Dio();
-const String baseurl = "http://192.168.1.94:5000"; // 🔹 Update this
+const String baseurl = "http://192.168.1.51:5000"; // 🔹 Update this
 
 class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();

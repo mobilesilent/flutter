@@ -249,8 +249,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
   List<Map<String, dynamic>> _activeClasses = [];
   
   // Add your college coordinates here
-  static const double _collegeLatitude = 11.2656384;  
-  static const double _collegeLongitude = 75.8054912;
+  static const double _collegeLatitude = 11.2578;  
+  static const double _collegeLongitude = 75.7887;
   static const double _collegeRadiusMeters = 500.0;  
 
   @override
